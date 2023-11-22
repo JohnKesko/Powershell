@@ -154,13 +154,13 @@ function Test-ConnectivityToMicrosoft
 function Test-DomainConnectivity {
     param (
         [Parameter(Mandatory=$true)]
-        [string]$pattern,
-        [string]$clientIp
+        [string]$Pattern,
+        [string]$ClientIP
     )
 
-    if ($clientIp -match $pattern) 
+    if ($ClientIP -match $Pattern) 
     {
-        WriteToLog -Message "Client IP is within the DHCP scope. The IP was: $($clientIp)" -Level INFO
+        WriteToLog -Message "Client IP is within the DHCP scope. The IP was: $($ClientIP)" -Level INFO
         WriteToLog -Message "Testing connectivity to the domain using nltest" -Level INFO
 
         try 
@@ -199,10 +199,10 @@ function Test-IsCiscoTunnelEstablished
     
     if ($null -ne $interface) 
     {
-        $interfaceIp = Get-NetIPAddress -InterfaceIndex $interface.ifIndex | Select-Object -ExpandProperty IPAddress
+        $interfaceIp = Get-NetIPAddress -InterfaceIndex $interface.ifIndex -AddressFamily IPv4 | Select-Object -ExpandProperty IPAddress
         WriteToLog -Message "Found interface: $($interface.Name) with IP: $interfaceIp and description: $($interface.InterfaceDescription)" -Level INFO
 
-        if (Test-DomainConnectivity -pattern $subnetPattern -clientIp $interfaceIp)
+        if (Test-DomainConnectivity -Pattern $subnetPattern -ClientIP $interfaceIp)
         {
             WriteToLog -Message "Domain connectivity successful" -Level INFO
             return $true

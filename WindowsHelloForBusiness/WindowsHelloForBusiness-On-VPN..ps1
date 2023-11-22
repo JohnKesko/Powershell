@@ -34,6 +34,7 @@ $networkCheckTimeout = 600 # 10 min  - If validations are not met within 10 min,
 $ciscoInterfaceName = "Cisco AnyConnect"
 $subnetPattern = "^10\.10\.(240\.([1-9]\d|[12]\d\d)|248\.([1-9]?\d|1\d\d|2[0-4]\d|25[0-4])|24[1-7]\.([1-9]?\d|[12]\d\d))$"
 $domainName = "mydomain.local"
+$domainController = "dc.mydomain.local"
 
 # Logging
 function WriteToLog {
@@ -160,9 +161,10 @@ function Test-DomainConnectivity {
 
         try 
         {
-            $nltestOutput = nltest /sc_verify:$domainName | Out-String
+            $nltestOutput = Invoke-Command -ScriptBlock { nltest /sc_query:$domainName } | Where-Object { $_ -match "Trusted DC Name" }
+            $nltestOutput.Split(" ")[3].Replace("\\", "").Trim()
 
-            if ($nltestOutput -match "The command completed successfully") 
+            if ($nltestOutput -match $domainController)
             {
                 WriteToLog -Message "Successfully verified secure channel to the domain controller" -Level INFO
                 return $true

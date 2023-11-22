@@ -119,7 +119,7 @@ function Detect-WindowsHelloForBusiness
 }
 
 # Check connectivity to Microsoft services
-function ConnectivityToMicrosoft
+function Test-ConnectivityToMicrosoft
 {
     $urls = @("https://login.microsoftonline.com", "https://login.microsoft.com", "https://enrollment.manage.microsoft.com/enrollmentserver/discovery.svc")
     foreach ($url in $urls) 
@@ -187,7 +187,7 @@ function Test-DomainConnectivity {
 }
 
 # Check if Cisco AnyConnect Tunnel is established
-function IsCiscoTunnelEstablished 
+function Test-IsCiscoTunnelEstablished 
 {
     $interface = Get-NetAdapter | Where-Object { $_.InterfaceDescription -match $ciscoInterfaceName -and $_.AdminStatus -eq "Up" }
     
@@ -208,7 +208,7 @@ function IsCiscoTunnelEstablished
 }
 
 # Check Hybrid-Join Device State
-function IsDeviceHybridAzureADJoined 
+function Test-IsDeviceHybridAzureADJoined 
 {
     try 
     {
@@ -238,7 +238,7 @@ WriteToLog -Message "Script start: $scriptStart" -Level INFO
 $elapsed = 0
 while ($elapsed -lt $networkCheckTimeout) 
 {
-    if ((IsCiscoTunnelEstablished) -and (ConnectivityToMicrosoft) -and (IsDeviceHybridAzureADJoined) -and (Detect-WindowsHelloForBusiness -eq $false))
+    if ((Test-IsCiscoTunnelEstablished) -and (Test-ConnectivityToMicrosoft) -and (Test-IsDeviceHybridAzureADJoined) -and (Detect-WindowsHelloForBusiness -eq $false))
     {
         WriteToLog -Message "All conditions met for Windows Hello for Business Provisioning" -Level INFO
         WriteToLog -Message "Starting Windows Hello for Business Provisioning" -Level INFO

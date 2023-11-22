@@ -203,7 +203,7 @@ function IsCiscoTunnelEstablished
         }
     }
 
-    WriteToLog -Message "Cisco AnyConnect Management Tunnel is not 'Up' yet - Waiting..." -Level WARNING
+    WriteToLog -Message "Cisco AnyConnect Tunnel is not 'Up' yet - Waiting..." -Level WARNING
     return $false
 }
 

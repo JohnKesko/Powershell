@@ -24,6 +24,12 @@
 
     Use the regex link to get the regex pattern.
 
+    NOTE:
+    To run this with Task Scheduler, show the UI for Windows Hello for Business provisioning but hide the powershell window:
+    - General Tab: "Run only when the user is logged in". The is because it needs UI interaction
+    - Action Tab Arguments: -windowstyle hidden -ExecutionPolicy bypass -File "path/to/script.ps1"
+    - Condition Tab (optional): Wake the computer to run this task
+
 .NOTES
     Filename: WindowsHelloForBusiness-On-VPN.ps1
     Version: 1.0
@@ -88,7 +94,7 @@ function Detect-WindowsHelloForBusiness
             elseif ($items.Where({$_.PSChildName -eq $loggedOnUserSID}).LogonCredsAvailable -ne 1) 
             {
                 WriteToLog -Message "[Multiple SIDs]: Not good. PIN credential provider NOT found for LoggedOnUserSID. This indicates that the user is not enrolled into WHfB." -Level WARNING
-                return $false
+                return $true
             }
             else 
             {
@@ -107,7 +113,7 @@ function Detect-WindowsHelloForBusiness
             elseif (($items.PSChildName -eq $loggedOnUserSID) -and ($items.LogonCredsAvailable -ne 1)) 
             {
                 WriteToLog -Message "[Single SID]: Not good. PIN credential provider NOT found for LoggedOnUserSID. This indicates that the user is not enrolled into WHfB." -Level WARNING
-                return $false
+                return $true
             }
             else 
             {
@@ -244,12 +250,31 @@ WriteToLog -Message "Script start: $scriptStart" -Level INFO
 $elapsed = 0
 while ($elapsed -lt $networkCheckTimeout) 
 {
-    if ((Test-IsCiscoTunnelEstablished) -and (Test-ConnectivityToMicrosoft) -and (Test-IsDeviceHybridAzureADJoined) -and (Detect-WindowsHelloForBusiness -eq $false))
+    if ((Detect-WindowsHelloForBusiness) -and (Test-IsCiscoTunnelEstablished) -and (Test-ConnectivityToMicrosoft) -and (Test-IsDeviceHybridAzureADJoined))
     {
         WriteToLog -Message "All conditions met for Windows Hello for Business Provisioning" -Level INFO
         WriteToLog -Message "Starting Windows Hello for Business Provisioning" -Level INFO
-        Start-Process "ms-cxh-full://nthaad"
-        break
+        
+        try 
+        {
+            $provisioningProcess = Start-Process "ms-cxh-full://nthaad" -PassThru 2>&1 | Out-File -Append -FilePath $logFile
+        }
+        catch 
+        {
+            WriteToLog -Message "Error starting provisioning process: $_" -Level ERROR
+        }
+        finally 
+        {
+            if ($provisioningProcess -and (-not $provisioningProcess.HasExited))
+            {
+                Stop-Process -Id $provisioningProcess.Id
+                WriteToLog -Message "Provisioning process stopped" -Level INFO
+            }
+            else
+            {
+                WriteToLog -Message "No provisioning process to stop" -Level INFO
+            }
+        }
     }
 
     Start-Sleep -Seconds $networkCheckInterval

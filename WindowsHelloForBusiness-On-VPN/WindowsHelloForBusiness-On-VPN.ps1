@@ -17,7 +17,11 @@
 
     NOTE:
     Use https://www.analyticsmarket.com/freetools/ipregex/ to specify your subnet range pattern you want to check.
-    For example if yo have multiple large DHCP scopes, let's say we start at 10.10.240.10/22, this will span to 10.10.243.254
+    
+    For example if we have multiple large DHCP scopes, let's say something like:
+    Scope A: 10.10.240.10/22, spans to 10.10.243.254
+    Scope B: 10.10.248.10/22, spans to 10.10.251.254
+
     Use the regex link to get the regex pattern.
 
 .NOTES
@@ -32,7 +36,7 @@ $scriptStart = Get-Date
 $networkCheckInterval = 10 # Seconds
 $networkCheckTimeout = 600 # 10 min  - If validations are not met within 10 min, exit the script
 $ciscoInterfaceName = "Cisco AnyConnect"
-$subnetPattern = "^10\.10\.(240\.([1-9]\d?|1\d\d|2[0-4]\d|25[0-4])|24[1-3]\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-4]))$"
+$subnetPattern = "^10\.10\.(240\.([1-9]\d?|1\d\d|2[0-4]\d|25[0-4])|24[1-3]\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-4])|248\.([1-9]\d?|1\d\d|2[0-4]\d|25[0-4])|24[9]\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-4])|25[0-1]\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-4]))$"
 $domainName = "mydomain.local"
 $domainController = "dc.mydomain.local"
 

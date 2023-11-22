@@ -94,12 +94,12 @@ function Detect-WindowsHelloForBusiness
         # Looking for the SID belonging to the logged on user is slightly different if there's not mulitple SIDs found in registry
         else 
         {
-            if (($items.PSChildName -eq $loggedOnUserSID) -AND ($items.LogonCredsAvailable -eq 1)) 
+            if (($items.PSChildName -eq $loggedOnUserSID) -and ($items.LogonCredsAvailable -eq 1)) 
             {
                 WriteToLog -Message "[Single SID]: All good. PIN credential provider found for LoggedOnUserSID. This indicates that user is enrolled into WHfB." -Level INFO
                 exit 0
             }
-            elseif (($items.PSChildName -eq $loggedOnUserSID) -AND ($items.LogonCredsAvailable -ne 1)) 
+            elseif (($items.PSChildName -eq $loggedOnUserSID) -and ($items.LogonCredsAvailable -ne 1)) 
             {
                 WriteToLog -Message "[Single SID]: Not good. PIN credential provider NOT found for LoggedOnUserSID. This indicates that the user is not enrolled into WHfB." -Level WARNING
                 return $false

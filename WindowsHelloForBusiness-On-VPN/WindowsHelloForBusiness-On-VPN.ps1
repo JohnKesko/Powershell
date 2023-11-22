@@ -11,6 +11,7 @@
     If the user is connected to VPN, we do multiple checks:
     - Is user connected to VPN and the interface is UP and have a valid IP-address from a DHCP scope
     - Can reach internet and multiple Microsoft M365 services
+    - Can reach the internal domain
     - Client is Azure Hybrid-Joined
 
     If all these conditions are met, we start Windows Hello for Business provisioning.

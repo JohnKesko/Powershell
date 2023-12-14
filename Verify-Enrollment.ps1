@@ -1,8 +1,8 @@
 function VerifyConnection()
 {
-    $ok = $false
-
     $urls = @("https://enrollment.manage.microsoft.com/EnrollmentServer/Discovery.svc", "https://manage.microsoft.com/")
+    $allUrlsOk = $true
+
     foreach ($url in $urls)
     {
         $res = Invoke-WebRequest -Uri $url
@@ -10,15 +10,22 @@ function VerifyConnection()
         if ($res.StatusCode -eq 200)
         {
             Write-Host "Successfully lookup to: $url"
-            $ok = $true
         }
         else
         {
             Write-Host "Could not reach $url"
+            $allUrlsOk = $false
         }
     }
 
-    return $ok
+    if ($allUrlsOk)
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
 }
 
 function VerifyEnrollment()
